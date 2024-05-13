@@ -11,6 +11,7 @@ import { approveOrder } from './routes/approve-order'
 import { cancelOrder } from './routes/cancel-order'
 import { dispatchOrder } from './routes/dispatch-order'
 import { deliverOrder } from './routes/deliver-order'
+import { getOrders } from './routes/get-orders'
 
 // HS256 -> secret
 // RS256 -> priv/pub
@@ -30,11 +31,15 @@ app.use(approveOrder)
 app.use(cancelOrder)
 app.use(dispatchOrder)
 app.use(deliverOrder)
+app.use(getOrders)
 app.onError(({ code, error, set }) => {
   switch (code) {
     case 'VALIDATION': {
       set.status = error.status
       return error.toResponse()
+    }
+    case 'NOT_FOUND': {
+      return new Response(null, { status: 404 })
     }
     default: {
       console.error(error)
