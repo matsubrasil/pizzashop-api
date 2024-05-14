@@ -2,8 +2,9 @@ import Elysia, { t } from 'elysia'
 import { auth } from '../auth'
 import { UnauthorizedError } from '../errors/unauthorized-error'
 import { db } from '../../db/connection'
-import { eq } from 'drizzle-orm'
+
 import { orders } from '../../db/schema'
+import { eq } from 'drizzle-orm'
 
 /**
  * Vamos ter uma rota para cada mudança de status do pedido.
@@ -21,8 +22,11 @@ export const approveOrder = new Elysia().use(auth).patch(
     }
 
     const order = await db.query.orders.findFirst({
-      where(fields, { eq }) {
-        return eq(fields.id, orderId)
+      where(fields, { eq, and }) {
+        return and(
+          eq(fields.id, orderId),
+          eq(fields.restaurantId, restaurantId),
+        )
       },
     })
 
